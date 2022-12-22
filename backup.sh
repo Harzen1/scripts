@@ -80,10 +80,12 @@ elif [[ "$option" == "2 - Restore from backup" ]]; then
     fi
 elif [[ "$option" == "3 - Push changes to Github" ]]; then
     cd $HOME/Documents/dotfiles
-        git add .
-        git commit -m "Backup script"
-        git push origin master
-        notify-send 'Changes pushed to Github'
+    git add .
+    git commit -m "Backup script"
+    git push origin master
+    notify-send 'Changes pushed to Github'
 elif [[ "$option" == "4 - Pull changes from Github" ]]; then
-
+    cd $HOME/Documents/dotfiles
+    git fetch origin master
+    git reset --hard origin/master
 fi
