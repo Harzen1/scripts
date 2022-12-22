@@ -19,8 +19,10 @@ b7=$HOME/Documents/dotfiles/zshrc/.
 b8=$HOME/Documents/dotfiles/starship/.
 
 declare -a options=(
-"1 - Backup to github"
+"1 - Backup to local folder"
 "2 - Restore from backup"
+"3 - Push changes to Github"
+"4 - Pull changes from Github"
 )
 declare -a files=(
 "1 - Alacritty"
@@ -33,8 +35,12 @@ declare -a files=(
 "9 - Zshrc"
 "All Files"
 )
+declare -a git=(
+"1 - Yes"
+"2 - No"
+)
 a=1
-### dmenu select
+# Rofi Backup
 option=$(printf '%s\n' "${options[@]}" | rofi -i -dmenu ${#files[@]} -p "Option: ")
 if [[ "$option" == "1 - Backup to github" ]];then
     file=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
@@ -48,6 +54,17 @@ if [[ "$option" == "1 - Backup to github" ]];then
         done
         notify-send 'Dotfiles Backed up'
     fi
+    choice=$(printf '%s\n' "${git[@]}" | rofi -i -dmenu ${#git[@]} -p "Push changes to Github?: ")
+    if [[ "choice" == "1 - Yes" ]];then
+        cd $HOME/Documents/dotfiles
+        git add .
+        git commit -m "Backup script"
+        git push origin master
+        notify-send 'Changes pushed to Github'
+    else
+        fi
+    fi
+# Rofi restore
 elif [[ "$option" == "2 - Restore from backup" ]]; then
     notify-send 'restore'
     file=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
@@ -61,4 +78,12 @@ elif [[ "$option" == "2 - Restore from backup" ]]; then
         done
         notify-send 'Dotfiles Restored From backup'
     fi
+elif [[ "$option" == "3 - Push changes to Github" ]]; then
+    cd $HOME/Documents/dotfiles
+        git add .
+        git commit -m "Backup script"
+        git push origin master
+        notify-send 'Changes pushed to Github'
+elif [[ "$option" == "4 - Pull changes from Github" ]]; then
+
 fi
