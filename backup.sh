@@ -66,7 +66,7 @@ if [[ "$option" == "1 - Backup to local folder" ]];then
         cd $HOME/Documents/$folder
         git add .
         git commit -m "Backup script"
-        git push origin master
+        git push origin main
         notify-send 'Changes pushed to Github'
     else
         exit 0
