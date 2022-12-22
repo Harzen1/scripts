@@ -104,8 +104,8 @@ elif [[ "$option" == "3 - Restore from Github" ]]; then
         folder="scripts"
     fi
     cd $HOME/Documents/$folder
-    git fetch origin master
-    git reset --hard origin/master
+    git fetch origin main
+    git reset --hard origin/main
     exit 0
 elif [[ "$option" == "4 - Push changes to Github" ]]; then
     choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Repos: ")
@@ -117,7 +117,7 @@ elif [[ "$option" == "4 - Push changes to Github" ]]; then
     cd $HOME/Documents/$folder
     git add .
     git commit -m "Backup script"
-    git push origin master
+    git push origin main
     notify-send 'Changes pushed to Github'
     exit 0
 fi
