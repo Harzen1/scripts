@@ -43,8 +43,7 @@ if [[ "$option" == "1 - Backup to github" ]];then
         do
             file=f$a
             backup=b$a
-            echo "cp -r ${!file} ${!backup}"
-            # cp -r ${!file} ${!backup}
+            cp -r ${!file} ${!backup}
             a=$(( $a + 1 ))
         done
         notify-send 'Dotfiles Backed up'
@@ -57,8 +56,7 @@ elif [[ "$option" == "2 - Restore from backup" ]]; then
         do
             file=f$a
             backup=b$a
-            echo "File: ${!file}"
-            # cp -r ${!backup} ${!file} 
+            cp -r ${!backup} ${!file} 
             a=$(( $a + 1 ))
         done
         notify-send 'Dotfiles Restored From backup'
