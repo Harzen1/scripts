@@ -1,91 +1,123 @@
 #!/bin/bash
-# current files
+# Dotfiles
+# Origin
 f1=$HOME/.config/alacritty/.
 f2=$HOME/.config/awesome/.
 f3=$HOME/.config/mpd/.
 f4=$HOME/.config/mpDris2/.
 f5=$HOME/.config/ncmpcpp/.
 f6=$HOME/.config/picom/.
-f7=$HOME/.zshrc
-f8=$HOME/.config/starship.toml
-# github files
+# special directory
+f7=$HOME/.config/starship.toml
+f8=$HOME/.zshrc
+# Github
 b1=$HOME/Documents/dotfiles/alacritty/.
 b2=$HOME/Documents/dotfiles/awesome/.
 b3=$HOME/Documents/dotfiles/mpd/.
 b4=$HOME/Documents/dotfiles/mpDris2/.
 b5=$HOME/Documents/dotfiles/ncmpcpp/.
 b6=$HOME/Documents/dotfiles/picom/.
-b7=$HOME/Documents/dotfiles/zshrc/.
-b8=$HOME/Documents/dotfiles/starship/.
-
+b7=$HOME/Documents/dotfiles/starship/.
+b8=$HOME/Documents/dotfiles/zshrc/.
+# Scripts
+scripts=$HOME/Documents/scripts/.
 declare -a options=(
 "1 - Backup to local folder"
-"2 - Restore from backup"
-"3 - Push changes to Github"
-"4 - Pull changes from Github"
+"2 - Restore from backup folder"
+"3 - Restore from Github"
+"4 - Push changes to Github"
 )
 declare -a files=(
-"1 - Alacritty"
-"2 - AwesomeWM"
-"3 - Mpd"
-"4 - MpDris2"
-"5 - Ncmpcpp"
-"6 - Picom"
-"7 - Starship"
-"9 - Zshrc"
-"All Files"
+"1 - Dotfiles"
+"2 - Scripts"
 )
 declare -a git=(
 "1 - Yes"
 "2 - No"
 )
+# number of times loop needs to run
+b=6
+# loop start number
 a=1
-# Rofi Backup
+# Local Folders Options
+# Backup
 option=$(printf '%s\n' "${options[@]}" | rofi -i -dmenu ${#files[@]} -p "Option: ")
-if [[ "$option" == "1 - Backup to github" ]];then
-    file=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
-    if [[ "$file" == "All Files" ]];then
-        while [[ $a -le 8 ]];
+if [[ "$option" == "1 - Backup to local folder" ]];then
+    choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
+    if [[ "$choice" == "1 - Dotfiles" ]];then
+        folder="dotfiles"
+        while [[ $a -le $b ]];
         do
             file=f$a
             backup=b$a
-            cp -r ${!file} ${!backup}
+            cp -r ${!file} ${!backup} 
             a=$(( $a + 1 ))
         done
+        cp -r $f7 $b7
+        cp -r $f8 $b8
         notify-send 'Dotfiles Backed up'
+    elif [[ "$choice" == "2 - Scripts" ]];then
+        folder="scripts"
+        cp -r $HOME/Scripts/. $HOME/Documents/scripts/
+        notify-send 'Scripts Backed up'
     fi
     choice=$(printf '%s\n' "${git[@]}" | rofi -i -dmenu ${#git[@]} -p "Push changes to Github?: ")
     if [[ "choice" == "1 - Yes" ]];then
-        cd $HOME/Documents/dotfiles
+        cd $HOME/Documents/$folder
         git add .
         git commit -m "Backup script"
         git push origin master
         notify-send 'Changes pushed to Github'
     else
-        fi
+        exit 0
     fi
-# Rofi restore
-elif [[ "$option" == "2 - Restore from backup" ]]; then
-    notify-send 'restore'
-    file=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
-    if [[ "$file" == "All Files" ]];then
-        while [[ $a -le 8 ]];
+    exit 0
+# restore
+elif [[ "$option" == "2 - Restore from backup folder" ]]; then
+    choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Folders: ")
+    if [[ "$choice" == "1 - Dotfiles" ]];then
+        while [[ $a -le $b ]];
         do
             file=f$a
             backup=b$a
-            cp -r ${!backup} ${!file} 
+            #cp -r ${!backup} ${!file} 
+            rsync -qav --exclude=".*" ${!backup} ${!file}
+            #cp -r $b7 $HOME/
             a=$(( $a + 1 ))
+            notify-send 'Dotfiles Restored From Backup'
         done
-        notify-send 'Dotfiles Restored From backup'
+        cp -r $b7 $HOME/.config/
+        cp -r $b8 $HOME/
+    elif [[ "$choice" == "2 - Scripts" ]];then
+        #cp -r $HOME/Documents/scripts/. /$HOME/Scripts/
+        rsync -qav --exclude=".*" $HOME/Documents/scripts/* $HOME/Scripts/
+        notify-send 'Scripts Restored From Backup'
     fi
-elif [[ "$option" == "3 - Push changes to Github" ]]; then
-    cd $HOME/Documents/dotfiles
+    exit 0
+
+# Github Options
+elif [[ "$option" == "3 - Restore from Github" ]]; then
+    choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Repos: ")
+    if [[ "$choice" == "1 - Dotfiles" ]];then
+        folder="dotfiles"
+    elif [[ "$choice" == "2 - Scripts" ]];then
+        folder="scripts"
+    fi
+    cd $HOME/Documents/$folder
+    git fetch origin master
+    git reset --hard origin/master
+    exit 0
+elif [[ "$option" == "4 - Push changes to Github" ]]; then
+    choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Repos: ")
+    if [[ "$choice" == "1 - Dotfiles" ]];then
+        folder="dotfiles"
+    elif [[ "$choice" == "2 - Scripts" ]];then
+        folder="scripts"
+    fi
+    cd $HOME/Documents/$folder
     git add .
     git commit -m "Backup script"
     git push origin master
     notify-send 'Changes pushed to Github'
-elif [[ "$option" == "4 - Pull changes from Github" ]]; then
-    cd $HOME/Documents/dotfiles
-    git fetch origin master
-    git reset --hard origin/master
+    exit 0
 fi
