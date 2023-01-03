@@ -62,7 +62,7 @@ if [[ "$option" == "1 - Backup to local folder" ]];then
         notify-send 'Scripts Backed up'
     fi
     choice=$(printf '%s\n' "${git[@]}" | rofi -i -dmenu ${#git[@]} -p "Push changes to Github?: ")
-    if [[ "$choice" == "1 - Yes" ]];then
+    if [[ "choice" == "1 - Yes" ]];then
         cd $HOME/Documents/$folder
         git add .
         git commit -m "Backup script"
