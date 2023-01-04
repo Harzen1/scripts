@@ -30,11 +30,24 @@ declare -a options=(
 declare -a files=(
 "1 - Dotfiles"
 "2 - Scripts"
+"3 - All"
 )
 declare -a git=(
 "1 - Yes"
 "2 - No"
 )
+gitpush(){
+cd $HOME/Documents/$folder
+git add .
+git commit -m "Backup script"
+git push origin main
+notify-send 'Changes pushed to Github'
+}
+gitpull(){
+cd $HOME/Documents/$folder
+git fetch origin main
+git reset --hard origin/main
+}
 # number of times loop needs to run
 b=6
 # loop start number
@@ -56,22 +69,21 @@ if [[ "$option" == "1 - Backup to local folder" ]];then
         cp -r $f7 $b7
         cp -r $f8 $b8
         notify-send 'Dotfiles Backed up'
+
     elif [[ "$choice" == "2 - Scripts" ]];then
         folder="scripts"
         cp -r $HOME/Scripts/. $HOME/Documents/scripts/
         notify-send 'Scripts Backed up'
     fi
+
     choice=$(printf '%s\n' "${git[@]}" | rofi -i -dmenu ${#git[@]} -p "Push changes to Github?: ")
     if [[ "choice" == "1 - Yes" ]];then
-        cd $HOME/Documents/$folder
-        git add .
-        git commit -m "Backup script"
-        git push origin main
-        notify-send 'Changes pushed to Github'
+      gitpush && exit 0
     else
         exit 0
     fi
-    exit 0
+    exit 1
+
 # restore
 elif [[ "$option" == "2 - Restore from backup folder" ]]; then
     choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Folders: ")
@@ -88,6 +100,7 @@ elif [[ "$option" == "2 - Restore from backup folder" ]]; then
         done
         cp -r $b7 $HOME/.config/
         cp -r $b8 $HOME/
+    
     elif [[ "$choice" == "2 - Scripts" ]];then
         #cp -r $HOME/Documents/scripts/. /$HOME/Scripts/
         rsync -qav --exclude=".*" $HOME/Documents/scripts/* $HOME/Scripts/
@@ -103,21 +116,14 @@ elif [[ "$option" == "3 - Restore from Github" ]]; then
     elif [[ "$choice" == "2 - Scripts" ]];then
         folder="scripts"
     fi
-    cd $HOME/Documents/$folder
-    git fetch origin main
-    git reset --hard origin/main
-    exit 0
-elif [[ "$option" == "4 - Push changes to Github" ]]; then
+    gitpull && exit 0
+
+  elif [[ "$option" == "4 - Push changes to Github" ]]; then
     choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Repos: ")
     if [[ "$choice" == "1 - Dotfiles" ]];then
         folder="dotfiles"
     elif [[ "$choice" == "2 - Scripts" ]];then
         folder="scripts"
     fi
-    cd $HOME/Documents/$folder
-    git add .
-    git commit -m "Backup script"
-    git push origin main
-    notify-send 'Changes pushed to Github'
-    exit 0
+    gitpush && exit 0
 fi
