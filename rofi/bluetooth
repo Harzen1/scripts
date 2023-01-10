@@ -1,0 +1,36 @@
+#!/bin/bash
+declare -a main=(
+"Connect"
+"Pair"
+"Power"
+"Exit"
+)
+power(){
+status=$(bluetoothctl show | grep -o 'Powered: [a-z]*')
+if [ $status == "Powered: yes"];then
+  powered="On"
+else
+  powered="Off"
+fi
+}
+list(){
+bluetoothctl devices | grep -oT ' [A-Za-z0-9: ]*' > $(echo $(pwd)/list)
+}
+connect(){
+list
+device=$(cat $(pwd)/list | rofi -dmenu -l 10 -p "Select Device: " | awk '{print $1}')
+connected=$(bluetoothctl info | awk 'NR == 1{print $2 }')
+#if [[ "$connected" == "device"]]
+bluetoothctl connect $device
+rm $(echo $(pwd)/list)
+}
+main-menu(){
+option=$(printf '%s\n' ${main[@]} | rofi -dmenu -l 4)
+[[ ${option} == "Connect" ]] && connect
+[[ ${option} == "Pair" ]] && pair
+[[ ${option} == "Power" ]] && Power
+[[ ${option} == "Exit" ]] && exit 0
+}
+main-menu
+#menu(){
+#}

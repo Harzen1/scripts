@@ -2,7 +2,7 @@
 ###################
 # Apps Installation
 ###################
-sudo pacman -S ntfs-3g zsh mpd ncmpcpp firefox veracrypt nitrogen alacritty flameshot guvcview xarchiver gpick lsd blueberry neovim xclip playerctl pamixer
+sudo pacman -S ntfs-3g zsh mpd ncmpcpp firefox veracrypt nitrogen alacritty flameshot guvcview xarchiver gpick lsd blueberry neovim xclip playerctl pamixer helix
 yay -S picom-pijulius-git zsh-autosuggestions-git zsh-sudo-git zsh-syntax-highlighting-git visual-studio-code-bin tor-browser
 curl -sS https://starship.rs/install.sh | sh
 ######################## 
@@ -24,6 +24,7 @@ mkdir $HOME./config/awesome
 mkdir $HOME./config/rofi
 mkdir $HOME./config/mpDris2
 mkdir $HOME./config/picom
+mkdir $HOME./conifg/helix
 ##########################
 # make symlinks
 # $HOME/.config/alacritty
@@ -34,4 +35,3 @@ mkdir $HOME./config/picom
 # $HOME/.config/mpDris2
 # $HOME/.config/picom
 ##########################
-#

@@ -47,37 +47,43 @@ gitpull(){
 cd $HOME/Documents/$folder
 git fetch origin main
 git reset --hard origin/main
+notify-send 'Dotfiles replaced from Github'
 }
-# number of times loop needs to run
-b=6
-# loop start number
+dotfiles(){
 a=1
-# Local Folders Options
+b=6
+folder="dotfiles"
+while [[ $a -le $b ]];
+do
+  file=f$a
+  backup=b$a
+  cp -r ${!file} ${!backup} 
+  a=$(( $a + 1 ))
+done
+cp -r $f7 $b7
+cp -r $f8 $b8
+notify-send 'Dotfiles Backed up'
+}
+scripts(){
+folder="scripts"
+cp -r $HOME/scripts/. $HOME/Documents/scripts/
+notify-send 'Scripts Backed up'
+}
+# local Folders Options
 # Backup
 option=$(printf '%s\n' "${options[@]}" | rofi -i -dmenu ${#files[@]} -p "Option: ")
 if [[ "$option" == "1 - Backup to local folder" ]];then
     choice=$(printf '%s\n' "${files[@]}" | rofi -i -dmenu ${#files[@]} -p "Files: ")
     if [[ "$choice" == "1 - Dotfiles" ]];then
-        folder="dotfiles"
-        while [[ $a -le $b ]];
-        do
-            file=f$a
-            backup=b$a
-            cp -r ${!file} ${!backup} 
-            a=$(( $a + 1 ))
-        done
-        cp -r $f7 $b7
-        cp -r $f8 $b8
-        notify-send 'Dotfiles Backed up'
-
+      dotfiles
     elif [[ "$choice" == "2 - Scripts" ]];then
-        folder="scripts"
-        cp -r $HOME/Scripts/. $HOME/Documents/scripts/
-        notify-send 'Scripts Backed up'
+      scripts
+    elif [[ "$choice" == "3 - All" ]];then
+     echo hehe 
     fi
-
+    echo hehehehehe
     choice=$(printf '%s\n' "${git[@]}" | rofi -i -dmenu ${#git[@]} -p "Push changes to Github?: ")
-    if [[ "choice" == "1 - Yes" ]];then
+    if [[ "$choice" == "1 - Yes" ]];then
       gitpush && exit 0
     else
         exit 0
@@ -103,7 +109,7 @@ elif [[ "$option" == "2 - Restore from backup folder" ]]; then
     
     elif [[ "$choice" == "2 - Scripts" ]];then
         #cp -r $HOME/Documents/scripts/. /$HOME/Scripts/
-        rsync -qav --exclude=".*" $HOME/Documents/scripts/* $HOME/Scripts/
+        rsync -qav --exclude=".*" $HOME/Documents/scripts/* $HOME/scripts/
         notify-send 'Scripts Restored From Backup'
     fi
     exit 0
@@ -124,6 +130,12 @@ elif [[ "$option" == "3 - Restore from Github" ]]; then
         folder="dotfiles"
     elif [[ "$choice" == "2 - Scripts" ]];then
         folder="scripts"
+    elif [[ "$choice" == "3 - All" ]];then
+        folder="dotfiles"
+        gitpush
+        folder="scripts"
+        gitpush
+        exit 0
     fi
     gitpush && exit 0
 fi
